@@ -21,13 +21,27 @@
                 <div class="content-preview-wrapper">
                   <div class="content-preview">
                     <div class="post-content">
-                      <h1>
-                        Avoiding <i>"Callback Hell"</i>
-                      </h1>
-                      <h2>
-                        <i>a guide to writing async javascript programs</i>
-                      </h2>
-                      work in progress!
+                      # Callback Hell
+                      
+                      *A guide to writing elegant asynchronous javascript programs*
+                      
+                      ### What is "*callback hell*"?
+                      
+                      Asynchronous javascript, or javascript that uses callbacks, is hard to get right intuitively. A lot of code ends up looking like this:
+                      
+                          getThingFromHardDrive(function(thing) {
+                            uploadToServer(thing, function(response) {
+                              saveToLogDatabase(response, function(logResponse) {
+                                getAnotherThingFromHardDrive(function(thing) {
+                                  // etc
+                                })
+                              })
+                            })
+                          })
+                      
+                      See all the instances of `function` and `})`? Eek! This is affectionately known as **callback hell**.
+                      
+                      In the above code example there are four functions being nested inside one another.
                     </div>
                   </div>
                 </div>
@@ -37,6 +51,18 @@
         </div>
       </div>
     </div>
+    <script src="marked.js"></script>
+    <script type="text/javascript">
+      var content = document.querySelector('.post-content')
+      // kinda hacky but whatever
+      var lines = content.innerHTML.split('\n')
+      var baseIndent = lines[1].split('#')[0]
+      lines = lines.map(function(line) {
+        return line.replace(baseIndent, '')
+      })
+      var trimmed = lines.join('\n')
+      content.innerHTML = marked(trimmed)
+    </script>
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
       document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
