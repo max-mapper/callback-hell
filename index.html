@@ -6,6 +6,8 @@
     <title>callback hell</title>
 
     <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/rainbow.github.css">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,8 +48,9 @@
                       ## #1: Name your functions
                       
                       Here is some (messy) browser javascript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
-                      
-                          document.querySelector('form').onsubmit = function(submitEvent) {
+                          
+                          var form = document.querySelector('form')
+                          form.onsubmit = function(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -61,8 +64,9 @@
                           }
                       
                       This code has two anonymous functions. Let's give em names!
-                      
-                          document.querySelector('form').onsubmit = function formSubmit(submitEvent) {
+
+                          var form = document.querySelector('form')
+                          form.onsubmit = function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -102,7 +106,7 @@
                       
                           document.querySelector('form').onsubmit = formSubmit
                           
-                      Code like this is less scary to look at and is easy to edit and hack on later.
+                      Code like this is less scary to look at and is easier to edit and hack on later.
                     </div>
                   </div>
                 </div>
@@ -112,18 +116,28 @@
         </div>
       </div>
     </div>
-    <script src="marked.js"></script>
+    <script src="javascripts/marked.js"></script>
     <script type="text/javascript">
       var content = document.querySelector('.post-content')
       // kinda hacky but whatever
       var lines = content.innerHTML.split('\n')
       var baseIndent = lines[1].split('#')[0]
-      lines = lines.map(function(line) {
+      lines = lines.map(function iterator(line) {
         return line.replace(baseIndent, '')
       })
       var trimmed = lines.join('\n')
       content.innerHTML = marked(trimmed)
     </script>
+    <script src="javascripts/rainbow-custom.min.js"></script>
+    
+    <script type="text/javascript">
+      var codeBlocks = document.querySelectorAll('code')
+      Array.prototype.forEach.call(codeBlocks, function iterator(block) {
+        block.setAttribute('data-language', 'javascript')
+      })
+      Rainbow.color()
+    </script>
+    
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
       document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
