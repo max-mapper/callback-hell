@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable = yes">
+
     <title>Callback Hell</title>
 
     <link rel="stylesheet" href="stylesheets/style.css">
     <link rel="stylesheet" href="stylesheets/rainbow.github.css">
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -24,13 +26,13 @@
                   <div class="content-preview">
                     <div class="post-content">
                       # Callback Hell
-                      
+
                       *A guide to writing elegant asynchronous javascript programs*
-                      
+
                       ### What is "*callback hell*"?
-                      
+
                       Asynchronous javascript, or javascript that uses callbacks, is hard to get right intuitively. A lot of code ends up looking like this:
-                      
+
                           getThingFromHardDrive(function(thing) {
                             uploadToServer(thing, function(response) {
                               saveToLogDatabase(response, function(logResponse) {
@@ -40,15 +42,15 @@
                               })
                             })
                           })
-                      
+
                       See all the instances of `function` and `})`? Eek! This is affectionately known as **callback hell**.
-                      
+
                       Writing better code isn't that hard! You only need to know about a few things:
-                      
+
                       ## Name your functions
-                      
+
                       Here is some (messy) browser javascript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
-                          
+
                           var form = document.querySelector('form')
                           form.onsubmit = function(submitEvent) {
                             var name = document.querySelector('input').value
@@ -62,7 +64,7 @@
                               statusMessage.value = body
                             })
                           }
-                      
+
                       This code has two anonymous functions. Let's give em names!
 
                           var form = document.querySelector('form')
@@ -78,17 +80,17 @@
                               statusMessage.value = body
                             })
                           }
-                          
-                      As you can see naming functions is super easy and does some nice things to your code: 
-                      
+
+                      As you can see naming functions is super easy and does some nice things to your code:
+
                        - makes code easier to read
                        - when exceptions happen you will get stacktraces that reference actual function names instead of "anonymous"
                        - allows you to keep your code shallow, or not nested deeply, which brings me to my next point:
-                       
+
                       ## Keep your code shallow
-                      
+
                       Building on the last example, lets go a bit further and get rid of the triple level nesting that is going on in the code:
-                      
+
                           function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
@@ -97,25 +99,25 @@
                               method: "POST"
                             }, postResponse)
                           }
-                      
+
                           function postResponse(err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
-                      
+
                           document.querySelector('form').onsubmit = formSubmit
 
                       Code like this is less scary to look at and is easier to edit, refactor and hack on later.
-                      
+
                       ## Modularize!
-                      
+
                       This is the most important part: **Anyone is capable of creating modules** (AKA libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
-                      
+
                       Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. Since I write javascript in both the browser and on the server I'll show a method that works in both but is still nice and simple.
-                      
+
                       Here is a new file called `formuploader.js` that contains our two functions from before:
-                      
+
                           function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
@@ -124,35 +126,35 @@
                               method: "POST"
                             }, postResponse)
                           }
-                  
+
                           function postResponse(err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
-                          
+
                           module.exports = {
                             submit: formSubmit,
                             response: postResponse
                           }
-                          
+
                       The `module.exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have define what should be shared when the module gets required (thats what the `module.exports` thing is).
-                      
+
                       To use CommonJS modules in the browser you can use a command-line thing called [browserify](https://github.com/substack/node-browserify). I won't go into the details on how to use it here but it lets you use `require` to load modules into your programs.
-                      
+
                       Now that we have `formuploader.js` (and it is loaded in the page as a script tag) we just need to require it and use it! Here is how our application specific code looks now:
-                
+
                           var formUploader = require('formuploader')
                           document.querySelector('form').onsubmit = formUploader.submit
-                      
+
                       Now our application is only two lines of code and has the following benefits:
-                      
+
                       - easier for new developers to understand -- they won't get bogged down by having to read through all of the `formuploader` functions
                       - `formuploader` can get used in other places without duplicating code and can easily be shared on github
                       - the code itself is nice and simple and easy to read
-                      
+
                       There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The one I showed here is what I consider to be the simplest one to understand.
-                      
+
                       *This page is a work in progress -- check back later for more content. Please improve it by [forking it on github](http://github.com/maxogden/callback-hell)*
                     </div>
                   </div>
@@ -165,35 +167,35 @@
     </div>
     <script src="javascripts/marked.js"></script>
     <script type="text/javascript">
-      
+
       var content = document.querySelector('.post-content')
-      
+
       // kinda hacky but whatever
       var lines = content.innerHTML.split('\n')
       var baseIndent = lines[1].split('#')[0]
-      
+
       lines = lines.map(function iterator(line) {
         return line.replace(baseIndent, '')
       })
-      
+
       var trimmed = lines.join('\n')
       content.innerHTML = marked(trimmed)
-      
+
     </script>
     <script src="javascripts/rainbow-custom.min.js"></script>
-    
+
     <script type="text/javascript">
-    
+
       var codeBlocks = document.querySelectorAll('code')
-      
+
       Array.prototype.forEach.call(codeBlocks, function iterator(block) {
         block.setAttribute('data-language', 'javascript')
       })
-      
+
       Rainbow.color()
-      
+
     </script>
-    
+
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
       document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
