@@ -1450,9 +1450,25 @@ label.error {
   #post .inner {
     width: 100%;
     margin: 0;
-    padding: 20px 0px 40px 0px;
+    padding: 10px 0px;
     }
   .toggle-mode {
     right: 0;
+    }
+  }
+
+  @media all and (max-width: 480px) {
+    .document .content-preview, .document .content {
+      width: 100%;
+      padding: 0;
+    }
+    .content-preview-wrapper {
+      padding-top: 0;
+    }
+    #container {
+      min-width: 100%;
+    }
+    .post-content {
+      padding: 20px 15px;
     }
   }
