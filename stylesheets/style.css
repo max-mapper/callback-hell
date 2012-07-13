@@ -1186,6 +1186,7 @@ ul.site li a {
 ---------------------------------------------*/
 
 .post-content {
+  white-space: pre;
   background: #fff;
   padding: 50px 100px;
   font-family: 'OpenSans', sans-serif;
