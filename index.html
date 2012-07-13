@@ -41,7 +41,68 @@
                       
                       See all the instances of `function` and `})`? Eek! This is affectionately known as **callback hell**.
                       
-                      In the above code example there are four functions being nested inside one another.
+                      Writing better code isn't that hard! You only need to know about a few things:
+                      
+                      ## #1: Name your functions
+                      
+                      Here is some (messy) browser javascript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
+                      
+                          document.querySelector('form').onsubmit = function(submitEvent) {
+                            var name = document.querySelector('input').value
+                            request({
+                              uri: "http://example.com/upload",
+                              body: name,
+                              method: "POST"
+                            }, function(err, response, body) {
+                              var statusMessage = document.querySelector('.status')
+                              if (err) return statusMessage.value = err
+                              statusMessage.value = body
+                            })
+                          }
+                      
+                      This code has two anonymous functions. Let's give em names!
+                      
+                          document.querySelector('form').onsubmit = function formSubmit(submitEvent) {
+                            var name = document.querySelector('input').value
+                            request({
+                              uri: "http://example.com/upload",
+                              body: name,
+                              method: "POST"
+                            }, function postResponse(err, response, body) {
+                              var statusMessage = document.querySelector('.status')
+                              if (err) return statusMessage.value = err
+                              statusMessage.value = body
+                            })
+                          }
+                          
+                      As you can see naming functions is super easy and does some nice things to your code: 
+                      
+                       - makes code easier to read
+                       - when exceptions happen you will get stacktraces that reference actual function names instead of "anonymous"
+                       - allows you to keep your code shallow, or not nested deeply, which brings me to my next point:
+                       
+                      ## #2: Keep your code shallow
+                      
+                      Building on the last example, lets go a bit further and get rid of the triple level nesting that is going on in our code:
+                      
+                          function formSubmit(submitEvent) {
+                            var name = document.querySelector('input').value
+                            request({
+                              uri: "http://example.com/upload",
+                              body: name,
+                              method: "POST"
+                            }, postResponse)
+                          }
+                      
+                          function postResponse(err, response, body) {
+                            var statusMessage = document.querySelector('.status')
+                            if (err) return statusMessage.value = err
+                            statusMessage.value = body
+                          }
+                      
+                          document.querySelector('form').onsubmit = formSubmit
+                          
+                      Code like this is less scary to look at and is easy to edit and hack on later.
                     </div>
                   </div>
                 </div>
