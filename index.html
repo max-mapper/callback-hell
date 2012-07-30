@@ -151,77 +151,77 @@
                       - `formuploader` can get used in other places without duplicating code and can easily be shared on github
                       - the code itself is nice and simple and easy to read
                       
-                      There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The one I showed here is what I consider to be the simplest one to understand.
-                      
+                      There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The ones shown here are what I consider to be the simplest to understand.
 
                       ## Put a closure on it
 
                       Sometimes you'll have objects that manage state along with event handling. This happens frequently in MVC apps. Let's start with a messy example:
 
                           var Launcher = function(rocket) {
-                            this.rocket = rocket;
-                          };
-                          
+                            this.rocket = rocket
+                          }
+
                           Launcher.prototype.isReady = function() {
-                            return rocket.isFueled() && rocket.isManned();
-                          };
+                            return rocket.isFueled() && rocket.isManned()
+                          }
 
                           Launcher.prototype.launch = function(e) {
                             if(this.isReady()) {
-                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type });
+                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type })
                             } else {
-                              console.log("can't launch yet");
-                              e.preventDefault();
+                              console.log("can't launch yet")
+                              e.preventDefault()
                             }
-                          };
+                          }
 
-                          var pad = new Launcher(rocket);
+                          var pad = new Launcher(rocket)
 
-                          $('#launch').click($.proxy(pad.launch, pad));
+                          $('#launch').click($.proxy(pad.launch, pad))
 
-                      The anti-pattern above, in which an event is bound to an instance function on an object is common in many MVC frameworks and client-side code. The `launch` function here has to be bound to the `Launcher` instance in order for the call to `this.isReady()` to work within that function. `this` must be bound to the `Launcher` instance rather than the event. jQuery offers the $.proxy function to accomplish this, while CoffeeScript provies a built-in workaround with the =&gt; operator. This example also illustrates the problem where an object begins to take on too many responsibilities - state _and_ event management.
+                      The anti-pattern above, in which an event is bound to an instance function on an object is common in many MVC frameworks and client-side code. The `launch` function here has to be bound to the `Launcher` instance in order for the call to `this.isReady()` to work within that function. `this` must be bound to the `Launcher` instance rather than the event. jQuery offers the `$.proxy` function to accomplish this, while CoffeeScript provides a built-in workaround with the `=>` operator. This example also illustrates the problem where an object begins to take on too many responsibilities - state _and_ event management.
 
                       A less messy solution is to create a prototype-specific handler object that wraps each event in a closure:
 
                           var Launcher = function(rocket) {
-                            this.rocket = rocket;
-                            this.type = 'heavy';
-                          };
-                          
+                            this.rocket = rocket
+                            this.type = 'heavy'
+                          }
+
                           Launcher.prototype.isReady = function() {
-                            return rocket.isFueled() && rocket.isManned();
-                          };
+                            return rocket.isFueled() && rocket.isManned()
+                          }
 
                           Launcher.prototype.launch = function() {
                             if(this.isReady()) {
-                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type });
-                              return true;
+                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type })
+                              return true
                             } else {
-                              return false;
+                              return false
                             }
-                          };
+                          }
 
                           Launcher.handlers = {
                             launchClick: function(launcher) {
                               return function(e) {
                                 if(!launcher.launch()) {
-                                  e.preventDefault();
-                                  console.log("can't launch yet");
+                                  e.preventDefault()
+                                  console.log("can't launch yet")
                                 }
-                              };
+                              }
                             }
-                          };
+                          }
 
-                          var pad = new Launcher(rocket);
+                          var pad = new Launcher(rocket)
 
-                          $('#launch').click(Launcher.handlers.launchClick(pad));
+                          $('#launch').click(Launcher.handlers.launchClick(pad))
 
                       This drives more of the DOM-related logic into another object and helps code clarity by specifically enumerating which objects interact with a given event. You also retain access to the `this` that points to the button being clicked.
                           
-                      A more detailed discussion is [here](http://numbers.brighterplanet.com/2011/06/10/a-pattern-for-javascript-events). See [Hootroot.com's source](http://github.com/brighterplanet/hootroot1/blob/master/app/assets/javascripts/controllers/index-controller.js) for a real-world example.
+                      A more detailed discussion of this particular closure pattern is [here](http://numbers.brighterplanet.com/2011/06/10/a-pattern-for-javascript-events). Additionally, see [Hootroot.com's source](http://github.com/brighterplanet/hootroot1/blob/master/app/assets/javascripts/controllers/index-controller.js) for a real-world example.
 
-
-                      *This page is a work in progress -- check back later for more content. Please improve it by [forking it on github](http://github.com/maxogden/callback-hell)*
+                      *Callback Hell is a work in progress -- check back later for more content.* 
+                      
+                      Please contribute new sections or fix existing ones by [forking this project on github](http://github.com/maxogden/callback-hell)!
                     </div>
                   </div>
                 </div>
@@ -231,6 +231,7 @@
         </div>
       </div>
     </div>
+    
     <script src="javascripts/marked.js"></script>
     <script type="text/javascript">
       
@@ -247,19 +248,31 @@
       
       var trimmed = lines.join('\n')
       content.innerHTML = marked(trimmed)
-      
     </script>
-    <script src="javascripts/rainbow-custom.min.js"></script>
     
+    <script src="javascripts/rainbow-custom.min.js"></script>
     <script type="text/javascript">
     
       var codeBlocks = document.querySelectorAll('code')
-      
+          
       Array.prototype.forEach.call(codeBlocks, function iterator(block) {
+        block.innerHTML = unescapeEntities(block.innerHTML)
         block.setAttribute('data-language', 'javascript')
       })
       
       Rainbow.color()
+      
+      // markdown is dumb and always escapes &, < and > with no way to override
+      function unescapeEntities(text) {
+        function un(text) {
+          var d = document.createElement("div")
+          d.innerHTML = text
+          return d.innerText
+        }
+        // need to unescape twice
+        // > -> &amp;gt; -> &gt; -> >
+        return un(un(text))
+      }
       
     </script>
     
