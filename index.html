@@ -153,6 +153,74 @@
                       
                       There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The one I showed here is what I consider to be the simplest one to understand.
                       
+
+                      ## Put a closure on it
+
+                      Sometimes you'll have objects that manage state along with event handling. This happens frequently in MVC apps. Let's start with a messy example:
+
+                          var Launcher = function(rocket) {
+                            this.rocket = rocket;
+                          };
+                          
+                          Launcher.prototype.isReady = function() {
+                            return rocket.isFueled() && rocket.isManned();
+                          };
+
+                          Launcher.prototype.launch = function(e) {
+                            if(this.isReady()) {
+                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type });
+                            } else {
+                              console.log("can't launch yet");
+                              e.preventDefault();
+                            }
+                          };
+
+                          var pad = new Launcher(rocket);
+
+                          $('#launch').click($.proxy(pad.launch, pad));
+
+                      The anti-pattern above, in which an event is bound to an instance function on an object is common in many MVC frameworks and client-side code. The `launch` function here has to be bound to the `Launcher` instance in order for the call to `this.isReady()` to work within that function. `this` must be bound to the `Launcher` instance rather than the event. jQuery offers the $.proxy function to accomplish this, while CoffeeScript provies a built-in workaround with the =&gt; operator. This example also illustrates the problem where an object begins to take on too many responsibilities - state _and_ event management.
+
+                      A less messy solution is to create a prototype-specific handler object that wraps each event in a closure:
+
+                          var Launcher = function(rocket) {
+                            this.rocket = rocket;
+                            this.type = 'heavy';
+                          };
+                          
+                          Launcher.prototype.isReady = function() {
+                            return rocket.isFueled() && rocket.isManned();
+                          };
+
+                          Launcher.prototype.launch = function() {
+                            if(this.isReady()) {
+                              $.ajax('/launch', { rocket_id: this.rocket.id, type: this.type });
+                              return true;
+                            } else {
+                              return false;
+                            }
+                          };
+
+                          Launcher.handlers = {
+                            launchClick: function(launcher) {
+                              return function(e) {
+                                if(!launcher.launch()) {
+                                  e.preventDefault();
+                                  console.log("can't launch yet");
+                                }
+                              };
+                            }
+                          };
+
+                          var pad = new Launcher(rocket);
+
+                          $('#launch').click(Launcher.handlers.launchClick(pad));
+
+                      This drives more of the DOM-related logic into another object and helps code clarity by specifically enumerating which objects interact with a given event. You also retain access to the `this` that points to the button being clicked.
+                          
+                      A more detailed discussion is [here](http://numbers.brighterplanet.com/2011/06/10/a-pattern-for-javascript-events). See [Hootroot.com's source](http://github.com/brighterplanet/hootroot1/blob/master/app/assets/javascripts/controllers/index-controller.js) for a real-world example.
+
+
                       *This page is a work in progress -- check back later for more content. Please improve it by [forking it on github](http://github.com/maxogden/callback-hell)*
                     </div>
                   </div>
