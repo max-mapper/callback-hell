@@ -236,7 +236,7 @@
     <script type="text/javascript">
       
       var content = document.querySelector('.post-content')
-      content.style['white-space'] = "normal"
+      content.setAttribute('style', "white-space: normal;")
       
       // kinda hacky but whatever
       var lines = content.innerHTML.split('\n')
@@ -269,7 +269,7 @@
         function un(text) {
           var d = document.createElement("div")
           d.innerHTML = text
-          return d.innerText
+          return d.innerText || d.text || d.textContent
         }
         // need to unescape twice
         // > -> &amp;gt; -> &gt; -> >
