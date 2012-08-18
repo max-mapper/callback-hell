@@ -130,13 +130,10 @@
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
+
+                          exports.submit = formSubmit
                           
-                          module.exports = {
-                            submit: formSubmit,
-                            response: postResponse
-                          }
-                          
-                      The `module.exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have define what should be shared when the module gets required (thats what the `module.exports` thing is).
+                      The `exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have define what should be shared when the module gets required (thats what the `exports` thing is).
                       
                       To use CommonJS modules in the browser you can use a command-line thing called [browserify](https://github.com/substack/node-browserify). I won't go into the details on how to use it here but it lets you use `require` to load modules into your programs.
                       
