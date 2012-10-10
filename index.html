@@ -102,7 +102,7 @@
                        
                       ## Keep your code shallow
                       
-                      Building on the last example, lets go a bit further and get rid of the triple level nesting that is going on in the code:
+                      Building on the last example, let's go a bit further and get rid of the triple level nesting that is going on in the code:
                       
                           function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
@@ -127,7 +127,7 @@
                       
                       This is the most important part: **Anyone is capable of creating modules** (AKA libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
                       
-                      Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. Since I write javascript in both the browser and on the server I'll show a method that works in both but is still nice and simple.
+                      Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. Since I write JavaScript in both the browser and on the server, I'll show a method that works in both but is still nice and simple.
                       
                       Here is a new file called `formuploader.js` that contains our two functions from before:
                       
@@ -148,7 +148,7 @@
 
                           exports.submit = formSubmit
                           
-                      The `exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have define what should be shared when the module gets required (thats what the `exports` thing is).
+                      The `exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have to define what should be shared when the module gets required (that's what the `exports` thing is).
                       
                       To use CommonJS modules in the browser you can use a command-line thing called [browserify](https://github.com/substack/node-browserify). I won't go into the details on how to use it here but it lets you use `require` to load modules into your programs.
                       
