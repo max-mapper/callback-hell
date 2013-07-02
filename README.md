@@ -1,1 +1,1 @@
-this will contain information about using callbacks, events and streams to write javascript programs
+this contains a page with information about using callbacks to write javascript programs
