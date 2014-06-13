@@ -98,8 +98,20 @@
                       
                        - makes code easier to read
                        - when exceptions happen you will get stacktraces that reference actual function names instead of "anonymous"
-                       - allows you to keep your code shallow, or not nested deeply, which brings me to my next point:
+                     
+                      It is worth noting that named functions <a href="http://elegantcode.com/2011/03/24/basic-javascript-part-12-function-hoisting/">are subject to the typical rules of javascript hoisting</a>
+                      which you should make an effort to understand. Two functions with the same name in the same function scope level will override each other. Therefore in the following case
                        
+                          form1.onsubmit = function formSubmit() {
+                              console.log("Form 1");
+                          }
+                          form2.onsubmit = function formSubmit() {
+                              console.log("Form 2");
+                          }
+                    
+                      will log `Form 2` for both form submissions! This is because all named functions get *hoisted* to the top of the scope
+                      and the second formSubmit overwrites the first.
+
                       ## Keep your code shallow
                       
                       Building on the last example, let's go a bit further and get rid of the triple level nesting that is going on in the code:
