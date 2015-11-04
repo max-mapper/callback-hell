@@ -68,7 +68,7 @@
                           form.onsubmit = function(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
-                              uri: "http://example.com/upload",
+                              url: "http://example.com/upload",
                               body: name,
                               method: "POST"
                             }, function(err, response, body) {
@@ -84,7 +84,7 @@
                           form.onsubmit = function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
-                              uri: "http://example.com/upload",
+                              url: "http://example.com/upload",
                               body: name,
                               method: "POST"
                             }, function postResponse(err, response, body) {
@@ -107,7 +107,7 @@
                           function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
-                              uri: "http://example.com/upload",
+                              url: "http://example.com/upload",
                               body: name,
                               method: "POST"
                             }, postResponse)
@@ -134,7 +134,7 @@
                           function formSubmit(submitEvent) {
                             var name = document.querySelector('input').value
                             request({
-                              uri: "http://example.com/upload",
+                              url: "http://example.com/upload",
                               body: name,
                               method: "POST"
                             }, postResponse)
