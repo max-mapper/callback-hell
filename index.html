@@ -82,7 +82,7 @@
                           downloadPhoto('http://coolcats.com/cat.gif', handlePhoto)
                           
                           function handlePhoto (error, photo) {
-                            if (err) console.error('Download error!', error)
+                            if (error) console.error('Download error!', error)
                             else console.log('Download finished', photo)
                           }
                           
