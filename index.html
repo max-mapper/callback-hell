@@ -25,28 +25,28 @@
                     <div class="post-content">
                       # Callback Hell
                       
-                      *A guide to writing asynchronous javascript programs*
+                      *A guide to writing asynchronous JavaScript programs*
                       
                       ### What is "*callback hell*"?
                       
-                      Asynchronous javascript, or javascript that uses callbacks, is hard to get right intuitively. A lot of code ends up looking like this:
+                      Asynchronous JavaScript, or JavaScript that uses callbacks, is hard to get right intuitively. A lot of code ends up looking like this:
                       
-                          fs.readdir(source, function(err, files) {
+                          fs.readdir(source, function (err, files) {
                             if (err) {
                               console.log('Error finding files: ' + err)
                             } else {
-                              files.forEach(function(filename, fileIndex) {
+                              files.forEach(function (filename, fileIndex) {
                                 console.log(filename)
-                                gm(source + filename).size(function(err, values) {
+                                gm(source + filename).size(function (err, values) {
                                   if (err) {
                                     console.log('Error identifying file size: ' + err)
                                   } else {
                                     console.log(filename + ' : ' + values)
                                     aspect = (values.width / values.height)
-                                    widths.forEach(function(width, widthIndex) {
+                                    widths.forEach(function (width, widthIndex) {
                                       height = Math.round(width / aspect)
                                       console.log('resizing ' + filename + 'to ' + height + 'x' + height)
-                                      this.resize(width, height).write(destination + 'w' + width + '_' + filename, function(err) {
+                                      this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
                                         if (err) console.log('Error writing file: ' + err)
                                       })
                                     }.bind(this))
@@ -56,22 +56,65 @@
                             }
                           })
                       
-                      See all the instances of `function` and `})`? Eek! This is affectionately known as **callback hell**.
+                      See the pyramid shape and all the `})` at the end? Eek! This is affectionately known as **callback hell**.
                       
-                      Writing better code isn't that hard! You only need to know about a few things:
+                      The cause of callback hell is when people try to write JavaScript in a way where execution happens visually from top to bottom. Lots of people make this mistake! In other languages like C, Ruby or Python there is the expectation that whatever happens on line 1 will finish before the code on line 2 starts running and so on down the file. As you will learn, JavaScript is different.
                       
-                      ## Name your functions
+                      ## What are callbacks?
                       
-                      Here is some (messy) browser javascript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
+                      Callbacks are just the name of a convention for using JavaScript functions. There isn't a special thing called a 'callback' in the JavaScript language, it's just a convention. Instead of immediately returning some result like most functions, functions that use callbacks take some time to produce a result. The word 'asynchronous', aka 'async' just means 'takes some time' or 'happens in the future, not right now'. Usually callbacks are only used when doing I/O, e.g. downloading things, reading files, talking to databases, etc.
+                      
+                      When you call a normal function you can use its return value:
+                      
+                          var result = multiplyTwoNumbers(5, 10)
+                          console.log(result)
+                          // 50 gets printed out
+
+                      However, functions that are async and use callbacks don't return anything right away.
+
+                          var photo = downloadPhoto('http://coolcats.com/cat.gif')
+                          // photo is 'undefined'!
+
+                      In this case the gif might take a very long time to download, and you don't want your program to pause (aka 'block') while waiting for the download to finish.
+                      
+                      Instead, you store the code that should run after the download is complete in a function. This is the callback! You give it to the `downloadPhoto` function and it will run your callback (e.g. 'call you back later') when the download is complete, and pass in the photo (or an error if something went wrong).
+                      
+                          downloadPhoto('http://coolcats.com/cat.gif', handlePhoto)
+                          
+                          function handlePhoto (error, photo) {
+                            if (err) console.error('Download error!', error)
+                            else console.log('Download finished', photo)
+                          }
+                          
+                          console.log('Download started')
+                      
+                      The biggest hurdle people have when trying to understand callbacks is understanding the order that things execute as a program runs. In this example three major things happen. First the `handlePhoto` function is declared, then the `downloadPhoto` function is invoked and passed the `handlePhoto` as its callback, and finally `'Download started'` is printed out.
+                      
+                      Note that the `handlePhoto` is not invoked yet, it is just created and passed as a callback into `downloadPhoto`. But it won't run until `downloadPhoto` finishes doing its task, which could take a long time depending on how fast the Internet connection is.
+                      
+                      This example is meant to illustrate two important concepts:
+                      
+                      - The `handlePhoto` callback is just a way to store stores some things to do at a later time
+                      - The order in which things happen does not read top-to-bottom, it jumps around based on when things complete
+                      
+                      ## How do I fix callback hell?
+                      
+                      Callback hell is caused by poor coding practices. Luckily writing better code isn't that hard!
+                      
+                      You only need to follow **two rules**:
+                      
+                      ## 1. Keep your code shallow
+                      
+                      Here is some messy browser JavaScript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
                           
                           var form = document.querySelector('form')
-                          form.onsubmit = function(submitEvent) {
+                          form.onsubmit = function (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
                               body: name,
                               method: "POST"
-                            }, function(err, response, body) {
+                            }, function (err, response, body) {
                               var statusMessage = document.querySelector('.status')
                               if (err) return statusMessage.value = err
                               statusMessage.value = body
@@ -81,30 +124,30 @@
                       This code has two anonymous functions. Let's give em names!
 
                           var form = document.querySelector('form')
-                          form.onsubmit = function formSubmit(submitEvent) {
+                          form.onsubmit = function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
                               body: name,
                               method: "POST"
-                            }, function postResponse(err, response, body) {
+                            }, function postResponse (err, response, body) {
                               var statusMessage = document.querySelector('.status')
                               if (err) return statusMessage.value = err
                               statusMessage.value = body
                             })
                           }
                           
-                      As you can see naming functions is super easy and does some nice things to your code: 
+                      As you can see naming functions is super easy and has some immediate benefits: 
                       
-                       - makes code easier to read
+                       - makes code easier to read thanks to the descriptive function names
                        - when exceptions happen you will get stacktraces that reference actual function names instead of "anonymous"
-                       - allows you to keep your code shallow, or not nested deeply, which brings me to my next point:
+                       - allows you to move the functions and reference them by their names
                        
-                      ## Keep your code shallow
+                      Now we can move the functions to the top level of our program:
                       
-                      Building on the last example, let's go a bit further and get rid of the triple level nesting that is going on in the code:
-                      
-                          function formSubmit(submitEvent) {
+                          document.querySelector('form').onsubmit = formSubmit
+                          
+                          function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -113,25 +156,25 @@
                             }, postResponse)
                           }
                       
-                          function postResponse(err, response, body) {
+                          function postResponse (err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
                       
-                          document.querySelector('form').onsubmit = formSubmit
-
-                      Code like this is less scary to look at and is easier to edit, refactor and hack on later.
+                      Note that the `function` declarations here are defined at the bottom of the file. This is thanks to [function hoisting](https://gist.github.com/maxogden/4bed247d9852de93c94c).
                       
-                      ## Modularize!
+                      ## 2. Modularize
                       
-                      This is the most important part: **Anyone is capable of creating modules** (AKA libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
+                      This is the most important part: **Anyone is capable of creating modules** (aka libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
                       
-                      Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. Since I write JavaScript in both the browser and on the server, I'll show a method that works in both but is still nice and simple.
+                      Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. I'll show a module pattern that works for either browser code or server code (or code that works in both):
                       
                       Here is a new file called `formuploader.js` that contains our two functions from before:
                       
-                          function formSubmit(submitEvent) {
+                          module.exports.submit = formSubmit
+                          
+                          function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -140,19 +183,15 @@
                             }, postResponse)
                           }
                   
-                          function postResponse(err, response, body) {
+                          function postResponse (err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
-
-                          exports.submit = formSubmit
                           
-                      The `exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have to define what should be shared when the module gets required (that's what the `exports` thing is).
+                      The `module.exports` bit is an example of the node.js module system which works in node, Electron and the browser using [browserify](https://github.com/substack/node-browserify). I quite like this style of modules because it works everywhere, is very simple to understand and doesn't require complex configuration files or scripts.
                       
-                      To use CommonJS modules in the browser you can use a command-line thing called [browserify](https://github.com/substack/node-browserify). I won't go into the details on how to use it here but it lets you use `require` to load modules into your programs.
-                      
-                      Now that we have `formuploader.js` (and it is loaded in the page as a script tag) we just need to require it and use it! Here is how our application specific code looks now:
+                      Now that we have `formuploader.js` (and it is loaded in the page as a script tag after being browserified) we just need to require it and use it! Here is how our application specific code looks now:
                 
                           var formUploader = require('formuploader')
                           document.querySelector('form').onsubmit = formUploader.submit
@@ -160,29 +199,41 @@
                       Now our application is only two lines of code and has the following benefits:
                       
                       - easier for new developers to understand -- they won't get bogged down by having to read through all of the `formuploader` functions
-                      - `formuploader` can get used in other places without duplicating code and can easily be shared on github
-                      - the code itself is nice and simple and easy to read
+                      - `formuploader` can get used in other places without duplicating code and can easily be shared on github or npm
                       
-                      There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The ones shown here are what I consider to be the simplest to understand.
+                      ### Summary
                       
+                      1. Don't nest functions. Give them names and place them at the top level of your program
+                      2. Use [function hoisting](https://gist.github.com/maxogden/4bed247d9852de93c94c) to your advantage to move functions 'below the fold'
+                      3. Better yet, place generic functions in a module to reduce the cognitive load required to understand your code
+                      
+                      The most important aspect of avoiding callback hell is **moving functions out of the way** so that the programs flow can be more easily understood without newcomers having to wade through all the detail of the functions to get to the meat of what the program is trying to do.
+                      
+                      You can start by moving the functions to the bottom of the file, then graduate to moving them into another file that you load in using a relative require like `require('./photo-helpers.js')` and then finally move them into a standalone module like `require('image-resize')`.
+                      
+                      Here are some rules of thumb when creating a module:
+                      
+                      - Start by moving repeatedly used code into a function
+                      - When your function (or a group of functions related to the same theme) get big enough, move them into another file and expose them using `module.exports`. You can load this using a relative require
+                      - If you have some code that can be used across multiple projects give it it's own readme, tests and `package.json` and publish it to github and npm. There are too many awesome benefits to this specific approach to list here!
+                      - A good module is small and focuses on one problem
+                      - Individual files in a module should not be longer than around 150 lines of JavaScript
+                      - A module shouldn't have more than one level of nested folders full of JavaScript files. If it does, it is probably doing too many things
+                      - Ask more experienced coders you know to show you examples of good modules until you have a good idea of what they look like. If it takes more than a few minutes to understand what is happening, it probably isn't a very good module.
+
                       ### I still don't get it
                       
-                      Try reading my [introduction to callbacks](https://github.com/maxogden/art-of-node#callbacks).
+                      Try reading my [longer introduction to callbacks](https://github.com/maxogden/art-of-node#callbacks), or try out some of the [nodeschool](http://nodeschool.io/) tutorials.
                       
-                      ### What about promises?
-                        [Promises](http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/) are a more abstract pattern of working with async code in JavaScript.
+                      Also check out the [browserify-handbook](https://github.com/substack/browserify-handbook) for examples of writing modular code.
                       
-                      The scope of this document is to show how to write vanilla javascript. If you use a third party library that adds abstraction to your JS then make sure you're willing to force everyone that contributes to your library to also have the same views on JS as you.
+                      ### What about promises/observables/etc?
                       
-                      In my own personal experience I use callbacks for 90% of the async code I write and when things get hairy I bring in something like the [async](https://github.com/caolan/async) library.
+                      [Promises](http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/) are a way to write async code that still appears as though it is executing in a top-down way. There are some very passionate promises proponents out there that you can learn from if you are interested. However callbacks are a fundamental part of JavaScript and I believe everyone should learn how to read and write them before they learn promises.
                       
-                      That being said, everyone develops their own unique JavaScript style and you should do what you like. Just remember that there are no absolutes: some people like to use only callbacks, some people don't.
-                      
-                      ### Additional reading
-                      
-                      - [A pattern for decoupling DOM events from @dkastner](https://gist.github.com/3392235)
-                                            
-                      Please contribute new sections or fix existing ones by [forking this project on github](http://github.com/maxogden/callback-hell)!
+                      In my own personal experience I use callbacks for 90% of the async code I write and when things get complicated I bring in something like [run-parallel](https://github.com/feross/run-parallel) or [run-series](https://github.com/feross/run-series). I don't think callbacks or promises really make a difference for me, the biggest impact comes from keeping code simple, not nested and split up into small modules.
+
+                      You can find the source for this [on github](http://github.com/maxogden/callback-hell).
                     </div>
                   </div>
                 </div>
@@ -241,7 +292,7 @@
     
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/JavaScript'%3E%3C/script%3E"));
     </script>
     <script type="text/javascript">
       try {
