@@ -233,11 +233,11 @@
                       
                       If you *really* want your async code to read top-to-bottom, there are some fancy things you can try. Note that **these may introduce performance and/or cross platform runtime compatibility issues**, so make sure to do your research.
                       
-                      [Promises](http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/) are a way to write async code that still appears as though it is executing in a top-down way, and handles more types of errors due to encouraged use of `try/catch` style error handling.
+                      **Promises** are a way to write async code that still appears as though it is executing in a top-down way, and handles more types of errors due to encouraged use of `try/catch` style error handling.
                       
-                      [Generators] let you 'pause' individual functions without pausing the state of the whole program, which at the cost of slightly more complex to understand code lets your async code appear to execute in a top-down fashion. Check out [watt](https://github.com/mappum/watt) for an example of this approach.
+                      **Generators** let you 'pause' individual functions without pausing the state of the whole program, which at the cost of slightly more complex to understand code lets your async code appear to execute in a top-down fashion. Check out [watt](https://github.com/mappum/watt) for an example of this approach.
                       
-                      [Async functions] are a proposed ES7 feature that will further wrap generators and promises in a higher level syntax. Check them out if that sounds interesting to you.
+                      **Async functions** are a proposed ES7 feature that will further wrap generators and promises in a higher level syntax. Check them out if that sounds interesting to you.
                       
                       Personally I use callbacks for 90% of the async code I write and when things get complicated I bring in something like [run-parallel](https://github.com/feross/run-parallel) or [run-series](https://github.com/feross/run-series). I don't think callbacks vs promises vs whatever else really make a difference for me, the biggest impact comes from keeping code simple, not nested and split up into small modules.
                       
