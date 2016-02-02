@@ -221,17 +221,27 @@
                       - A module shouldn't have more than one level of nested folders full of JavaScript files. If it does, it is probably doing too many things
                       - Ask more experienced coders you know to show you examples of good modules until you have a good idea of what they look like. If it takes more than a few minutes to understand what is happening, it probably isn't a very good module.
 
-                      ### I still don't get it
+                      ### More reading
                       
                       Try reading my [longer introduction to callbacks](https://github.com/maxogden/art-of-node#callbacks), or try out some of the [nodeschool](http://nodeschool.io/) tutorials.
                       
                       Also check out the [browserify-handbook](https://github.com/substack/browserify-handbook) for examples of writing modular code.
                       
-                      ### What about promises/observables/etc?
+                      ### What about promises/generators/ES6 etc?
                       
-                      [Promises](http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/) are a way to write async code that still appears as though it is executing in a top-down way. There are some very passionate promises proponents out there that you can learn from if you are interested. However callbacks are a fundamental part of JavaScript and I believe everyone should learn how to read and write them before they learn promises.
+                      Before looking at more advanced solutions, remember that callbacks are a fundamental part of JavaScript (since they are just functions) and you should learn how to read and write them before moving on to more advanced language features, since they all depend on an understanding of callbacks. If you can't yet write maintainable callback code, keep working at it!
                       
-                      In my own personal experience I use callbacks for 90% of the async code I write and when things get complicated I bring in something like [run-parallel](https://github.com/feross/run-parallel) or [run-series](https://github.com/feross/run-series). I don't think callbacks or promises really make a difference for me, the biggest impact comes from keeping code simple, not nested and split up into small modules.
+                      If you *really* want your async code to read top-to-bottom, there are some fancy things you can try. Note that **these may introduce performance and/or cross platform runtime compatibility issues**, so make sure to do your research.
+                      
+                      [Promises](http://domenic.me/2012/10/14/youre-missing-the-point-of-promises/) are a way to write async code that still appears as though it is executing in a top-down way, and handles more types of errors due to encouraged use of `try/catch` style error handling.
+                      
+                      [Generators] let you 'pause' individual functions without pausing the state of the whole program, which at the cost of slightly more complex to understand code lets your async code appear to execute in a top-down fashion. Check out [watt](https://github.com/mappum/watt) for an example of this approach.
+                      
+                      [Async functions] are a proposed ES7 feature that will further wrap generators and promises in a higher level syntax. Check them out if that sounds interesting to you.
+                      
+                      Personally I use callbacks for 90% of the async code I write and when things get complicated I bring in something like [run-parallel](https://github.com/feross/run-parallel) or [run-series](https://github.com/feross/run-series). I don't think callbacks vs promises vs whatever else really make a difference for me, the biggest impact comes from keeping code simple, not nested and split up into small modules.
+                      
+                      Regardless of the method you choose, always **handle every error** and **keep your code simple**.
 
                       ### Remember, only *you* can prevent callback hell and forest fires
                       
