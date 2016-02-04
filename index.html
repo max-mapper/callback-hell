@@ -101,7 +101,7 @@
                       
                       Callback hell is caused by poor coding practices. Luckily writing better code isn't that hard!
                       
-                      You only need to follow **two rules**:
+                      You only need to follow **three rules**:
                       
                       ## 1. Keep your code shallow
                       
@@ -200,12 +200,34 @@
                       
                       - easier for new developers to understand -- they won't get bogged down by having to read through all of the `formuploader` functions
                       - `formuploader` can get used in other places without duplicating code and can easily be shared on github or npm
+
+                      ## 3. Handle every single error
+                                            
+                      There are different types of errors: syntax errors caused by the programmer (usually caught when you try to first run the program), runtime errors caused by the programmer (the code ran but had a bug that caused something to mess up), platform errors caused by things like invalid file permissions, hard drive failure, no network connection etc. This section is only meant to address this last class of errors.
+                      
+                      The first two rules are primarily about making your code readable, but this one is about making your code stable. When dealing with callbacks you are by definition dealing with tasks that get dispatched, go off and do something in the background, and then complete successfully or abort due to failure. Any experienced developer will tell you that you can never know when these errors happen, so you have to plan on them always happening.
+                      
+                      With callbacks the most popular way to handle errors is the Node.js style where the first argument to the callback is always reserved for an error.
+                      
+                           var fs = require('fs')
+                           
+                           fs.readFile('/Does/not/exist', handleFile)
+                           
+                           function handleFile (error, file) {
+                             if (error) return console.error('Uhoh, there was an error', error)
+                             // otherwise, continue on and use `file` in your code
+                           }
+                      
+                      Having the first argument be the `error` is a simple convention that encourages you to remember to handle your errors. If it was the second argument you could write code like `function handleFile (file) { }` and more easily ignore the error.
+                      
+                      Code linters can also be configured to help you remember to handle callback errors. The simplest one to use is called [standard](http://standardjs.com/). All you have to do is run `$ standard` in your code folder and it will show you every callback in your code with an unhandled error.
                       
                       ### Summary
                       
                       1. Don't nest functions. Give them names and place them at the top level of your program
                       2. Use [function hoisting](https://gist.github.com/maxogden/4bed247d9852de93c94c) to your advantage to move functions 'below the fold'
-                      3. Better yet, place generic functions in a module to reduce the cognitive load required to understand your code
+                      3. Handle **every single error** in every one of your callbacks. Use a linter like [standard](http://standardjs.com/) to help you with this.
+                      4. Create reusable functions and place them in a module to reduce the cognitive load required to understand your code. Splitting your code into small pieces like this also helps you handle errors, write tests, forces you to create a stable and documented  public API for your code, and helps with refactoring.
                       
                       The most important aspect of avoiding callback hell is **moving functions out of the way** so that the programs flow can be more easily understood without newcomers having to wade through all the detail of the functions to get to the meat of what the program is trying to do.
                       
