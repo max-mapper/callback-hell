@@ -198,7 +198,6 @@ and your footer gets pushed down a bit more, creating vertical scroll bars in th
 
 #container { 
   min-height: 100%;
-  min-width: 960px;
   }
 
 #footer {
@@ -1144,7 +1143,6 @@ ul.site li a {
 
 .document .content-preview, .document .content {
   padding: 20px 0px;
-  width: 960px;
   margin: 0 auto;
   }
 
