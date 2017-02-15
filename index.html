@@ -45,7 +45,7 @@
                                     aspect = (values.width / values.height)
                                     widths.forEach(function(width, widthIndex) {
                                       height = Math.round(width / aspect)
-                                      console.log('resizing ' + filename + 'to ' + height + 'x' + height)
+                                      console.log('resizing ' + filename + 'to ' + width + 'x' + height)
                                       this.resize(width, height).write(destination + 'w' + width + '_' + filename, function(err) {
                                         if (err) console.log('Error writing file: ' + err)
                                       })
