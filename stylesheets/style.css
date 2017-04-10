@@ -1,6 +1,57 @@
-/* ------------------------------------------
-  Typography / Basics
----------------------------------------------*/
+@charset "utf-8"; 
+
+/* use the typo.css */
+html{color:#555; background:#fff; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%}
+body, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, group, menu, nav, section{margin:0; padding:0;white-space:normal;}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{display:block}
+audio, canvas, video{display:inline-block; *display:inline; *zoom:1}
+body, button, input, select, textarea{font:500 14px/1.8 'Hiragino Sans GB',sans-serif}
+table{border-collapse:collapse; border-spacing:0}
+th{text-align:inherit}
+fieldset, img{border:0}
+iframe{display:block}
+blockquote{margin:1em 4em 1em 2em; padding:0.6em 1em; background:#f1f1f1}
+blockquote blockquote{padding:0 0 0 1em; margin-left:2em; border-left:0.4em solid #ddd}
+acronym, abbr{border-bottom:1px dotted; font-variant:normal}
+abbr{cursor:help}
+del{text-decoration:line-through}
+address, caption, cite, code, den, em, th, var{font-style:normal; font-weight:500}
+ul, ol{list-style:none}
+caption, th{text-align:left}
+q:before, q:after{content:''}
+sub, sup{font-size:75%; line-height:0; position:relative; vertical-align:text-top\9}
+:root sub, :root sup{vertical-align:baseline}
+sup{top:-0.5em}
+sub{bottom:-0.25em}
+a:hover{text-decoration:underline}
+ins, a{text-decoration:none}
+u, .typo-u{text-decoration:underline}
+mark{background:#fffdd1}
+pre, code{font-family:"Courier New",Courier,monospace}
+pre{border:1px solid #ddd; border-left-width:0.4em; background:#fbfbfb; padding:10px}
+small{font-size:12px; color:#888}
+.clearfix:before, .clearfix:after{content:""; display:table}
+.clearfix:after{clear:both}
+.clearfix{zoom:1}
+.typo p, .typo pre, .typo ul, .typo ol, .typo dl, .typo form, .typo hr, .typo table, 
+.typo-p, .typo-pre, .typo-ul, .typo-ol, .typo-dl, .typo-form, .typo-hr, .typo-table{margin-bottom:1em}
+h1, h2, h3, h4, h5, h6{font-weight:500; font-weight:800\9; color:#333}
+.typo h1, .typo h2, .typo h3, .typo h4, .typo h5, .typo h6, 
+.typo-h1, .typo-h2, .typo-h3, .typo-h4, .typo-h5, .typo-h6{margin-bottom:0.4em; line-height:1.5}
+.typo h1, .typo-h1{font-size:1.8em}
+.typo h2, .typo-h2{font-size:1.6em}
+.typo h3, .typo-h3{font-size:1.4em}
+.typo h4, .typo-h4{font-size:1.2em}
+.typo h5, .typo h6, .typo-h5, .typo-h6{font-size:1em}
+.typo ul, .typo-ul{margin-left:1.3em; list-style:disc}
+.typo ol, .typo-ol{list-style:decimal; margin-left:1.9em}
+.typo li ul, .typo li ol, .typo-ul ul, .typo-ul ol, .typo-ol ul, .typo-ol ol{margin-top:0; margin-bottom:0; margin-left:2em}
+.typo li ul, .typo-ul ul, .typo-ol ul{list-style:circle}
+.typo table th, .typo table td, .typo-table th, .typo-table td{border:1px solid #ddd; padding:5px 10px}
+.typo table th, .typo-table th{background:#fbfbfb}
+.typo table thead th, .typo-table thead th{background:#f1f1f1}
+.typo-em, .typo em{font-weight:700}
+
 html,body {
   color: #57676e;
   background: #e7eef2;
@@ -8,10 +59,6 @@ html,body {
   height: 100%;
   line-height: 1.5em;
   }
-
-body,
-textarea,
-input { font: 13px/20px 'OpenSans', sans-serif; }
 
 a {
   color: #434c50;
@@ -35,46 +82,10 @@ a:active {
 
 p > a {font-weight: 700;}
 
-h1,h2,h3,h4,h5,h6 {
-  margin: 0;
-  line-height: 1.5em;
-  }
-h4, h5, h6 {
-  }
-
-h1 { font-size: 24px; }
 h1 small { font-size: 13px; font-weight: 400; }
-h2 { 
-  font-weight: 400;
-  font-size: 16px;
-  padding: 5px 0 5px 30px;
-  }
 h2 small { font-size: 16px; font-weight: 400; }
-h3 { 
-  font-size: 11px;
-  text-transform: uppercase;
-  font-weight: 700;
-  margin-top: 10px;
-  }
-
 h3 small { font-size: 14px; font-weight: 400; }
-h4 { font-size: 14px; }
-h5 { font-size: 13px; }
-h6 { font-size: 11px; font-weight: 400; }
 
-p {
-  font-size: 16px;
-  line-height: 1.5em;
-	margin-bottom: 0px; 
-	margin-top: 10px;
-  }
-/* Use border-box box model */
-
-* {
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  }
 
 /* ------------------------------------------
   Globals
@@ -337,7 +348,6 @@ body:before {/* thanks to Maleika (Kohoutec)*/
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  font-family:'OpenSans', sans-serif; 
   text-transform: uppercase;
   font-size: 11px;
   font-weight: 700;
@@ -1189,7 +1199,6 @@ ul.site li a {
   white-space: pre;
   background: #fff;
   padding: 50px 100px;
-  font-family: 'OpenSans', sans-serif;
   font-weight: 400;
   border: 1px solid #C3CCD0;
   font-size: 16px;
