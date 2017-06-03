@@ -23,30 +23,30 @@
                 <div class="content-preview-wrapper">
                   <div class="content-preview">
                     <div class="post-content">
-                      # Callback Hell
+                      # 回调地狱
                       
-                      *A guide to writing elegant asynchronous javascript programs*
+                      *JavaScript异步程序书写指南*
                       
-                      ### What is "*callback hell*"?
+                      ### 什么是“*回调地狱*”？
                       
-                      Asynchronous javascript, or javascript that uses callbacks, is hard to get right intuitively. A lot of code ends up looking like this:
+                      我们很难一眼就看懂异步JavaScript，或者是使用回调函数的JavaScript程序。例如下面这段代码：
                       
-                          fs.readdir(source, function(err, files) {
+                          fs.readdir(source, function (err, files) {
                             if (err) {
                               console.log('Error finding files: ' + err)
                             } else {
-                              files.forEach(function(filename, fileIndex) {
+                              files.forEach(function (filename, fileIndex) {
                                 console.log(filename)
-                                gm(source + filename).size(function(err, values) {
+                                gm(source + filename).size(function (err, values) {
                                   if (err) {
                                     console.log('Error identifying file size: ' + err)
                                   } else {
                                     console.log(filename + ' : ' + values)
                                     aspect = (values.width / values.height)
-                                    widths.forEach(function(width, widthIndex) {
+                                    widths.forEach(function (width, widthIndex) {
                                       height = Math.round(width / aspect)
                                       console.log('resizing ' + filename + 'to ' + height + 'x' + height)
-                                      this.resize(width, height).write(destination + 'w' + width + '_' + filename, function(err) {
+                                      this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
                                         if (err) console.log('Error writing file: ' + err)
                                       })
                                     }.bind(this))
@@ -56,55 +56,98 @@
                             }
                           })
                       
-                      See all the instances of `function` and `})`? Eek! This is affectionately known as **callback hell**.
+                      这个一堆以```})```结尾的金字塔，我们很亲切地称它为——“**回调地狱**”。
                       
-                      Writing better code isn't that hard! You only need to know about a few things:
+                      之所以会出现回调地狱，是因为我们写JavaScript一般是视觉上的从上到下书写。很多人犯了这个错误！在例如C、Ruby或者Python等其他语言，在第二行代码运行之前，第一行代码肯定已经运行完了。然而如后面所说的，JavaScript是不同的。
+
+                      ## 什么是回调函数？
                       
-                      ## Name your functions
+                      回调函数是JavaScript里约定俗成的一个名称。实际上并不存在确定的“回调函数”，只是大家就管那个位置的函数作回调函数。与大多数运行后立刻给出结果的函数不同，使用回调的函数要花一些时间才能得出结果。“异步”这个词就是代表‘要花时间，将来运行’。通常回调函数会用在下载文件、读取文件、或者数据库相关事务等。
                       
-                      Here is some (messy) browser javascript that uses [browser-request](https://github.com/iriscouch/browser-request) to make an AJAX request to a server:
+                     当你调用一个普通函数，你可以立刻得到它的值：
+                      
+                          var result = multiplyTwoNumbers(5, 10)
+                          console.log(result)
+                          // 50 gets printed out
+
+                      而使用回调的函数不能立刻得到反馈。
+
+                          var photo = downloadPhoto('http://coolcats.com/cat.gif')
+                          // photo is 'undefined'!
+
+                      这个时候，这张gif可能要下载很久，你总不能让程序什么都不干停下来就等它下载完。
+                      
+                      相反，你可以储存下载完后触发的代码到一个函数里，这就是回调函数！把这些代码写进`downloadPhoto`函数，下载成功后，会运行回调函数。
+
+                          downloadPhoto('http://coolcats.com/cat.gif', handlePhoto)
+                          
+                          function handlePhoto (error, photo) {
+                            if (error) console.error('Download error!', error)
+                            else console.log('Download finished', photo)
+                          }
+                          
+                          console.log('Download started')
+                      
+                      我们理解回调最难的地方就是理解程序的运行顺序。例子中发生了三个主要事件，首先是`handlePhot``函数被声明，然后作为回调函数被`downloadPhoto`函数调用，最后控制台打印出`'Download started'`。
+                      
+                      注意此时`handlePhoto`还没有被调用，它只是被创建然后最为回调函数传入`downloadPhoto`。直到`downloadPhoto`完成下载，他都不会运行。
+                      
+                      这个例子说明两个问题：
+                      
+                      - `handlePhoto`（回调函数）只是储存了将要运行的东西
+                      - 不要从上到下阅读程序，程序会根据事情完成而跳转
+                      
+                      ## 怎么修复回调地狱？
+                      
+                      Callback hell is caused by poor coding practices. Luckily writing better code isn't that hard!
+                      
+                      你只需要跟着一下**三步**走：
+                      
+                      ## 1. 减少代码嵌套
+                      
+                      以下是一些用于AJAX的浏览器端代码（使用[browser-request](https://github.com/iriscouch/browser-request)）：
                           
                           var form = document.querySelector('form')
-                          form.onsubmit = function(submitEvent) {
+                          form.onsubmit = function (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
                               body: name,
                               method: "POST"
-                            }, function(err, response, body) {
+                            }, function (err, response, body) {
                               var statusMessage = document.querySelector('.status')
                               if (err) return statusMessage.value = err
                               statusMessage.value = body
                             })
                           }
                       
-                      This code has two anonymous functions. Let's give em names!
+                      这段代码有两个匿名函数，我们来赋予他们一个函数！
 
                           var form = document.querySelector('form')
-                          form.onsubmit = function formSubmit(submitEvent) {
+                          form.onsubmit = function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
                               body: name,
                               method: "POST"
-                            }, function postResponse(err, response, body) {
+                            }, function postResponse (err, response, body) {
                               var statusMessage = document.querySelector('.status')
                               if (err) return statusMessage.value = err
                               statusMessage.value = body
                             })
                           }
                           
-                      As you can see naming functions is super easy and does some nice things to your code: 
+                      你们看，给函数命名很简单，但是好处可不少：
                       
-                       - makes code easier to read
-                       - when exceptions happen you will get stacktraces that reference actual function names instead of "anonymous"
-                       - allows you to keep your code shallow, or not nested deeply, which brings me to my next point:
+                       - 有了函数名，可以很容易知道这段代码的作用
+                       - 在控制台调试出错的时候，控制台会告诉你是哪个函数出错了，而不是一个匿名函数（anonymous）
+                       - 可以让你把这些函数移动到合适的位置，使用的时候用函数名调用就可以了
                        
-                      ## Keep your code shallow
+                      现在我们都写到程序最外层：
                       
-                      Building on the last example, let's go a bit further and get rid of the triple level nesting that is going on in the code:
-                      
-                          function formSubmit(submitEvent) {
+                          document.querySelector('form').onsubmit = formSubmit
+                          
+                          function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -113,25 +156,25 @@
                             }, postResponse)
                           }
                       
-                          function postResponse(err, response, body) {
+                          function postResponse (err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
                       
-                          document.querySelector('form').onsubmit = formSubmit
-
-                      Code like this is less scary to look at and is easier to edit, refactor and hack on later.
+                      注意，函数声明在底部，却仍然能调用，这得益于[函数提升](https://gist.github.com/maxogden/4bed247d9852de93c94c)。
                       
-                      ## Modularize!
+                      ## 2. 模块化
                       
-                      This is the most important part: **Anyone is capable of creating modules** (AKA libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
+                      This is the most important part: **Anyone is capable of creating modules** (aka libraries). To quote [Isaac Schlueter](http://twitter.com/izs) (of the node.js project): *"Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there."*
                       
-                      Let's take out the boilerplate code from above and turn it into a module by splitting it up into a couple of files. Since I write JavaScript in both the browser and on the server, I'll show a method that works in both but is still nice and simple.
+                      用上面的例子，我们将把它拆分成多个文件，我会告诉你怎么把他做成模块。
                       
-                      Here is a new file called `formuploader.js` that contains our two functions from before:
+                      创建一个包含前面两个函数的新文件`formuploader.js`：
                       
-                          function formSubmit(submitEvent) {
+                          module.exports.submit = formSubmit
+                          
+                          function formSubmit (submitEvent) {
                             var name = document.querySelector('input').value
                             request({
                               uri: "http://example.com/upload",
@@ -140,38 +183,94 @@
                             }, postResponse)
                           }
                   
-                          function postResponse(err, response, body) {
+                          function postResponse (err, response, body) {
                             var statusMessage = document.querySelector('.status')
                             if (err) return statusMessage.value = err
                             statusMessage.value = body
                           }
-
-                          exports.submit = formSubmit
                           
-                      The `exports` bit at the end is an example of the CommonJS module system, which is used by Node.js for server side javascript programming. I quite like this style of modules because it is so simple -- you only have to define what should be shared when the module gets required (that's what the `exports` thing is).
+                      ```module.exports```来自node.js的模块系统，可以使用在node、Electron，浏览器上（借助browserify）。我十分喜欢这种风格，因为哪儿都能用，而且易于理解，不用依赖于其他复杂设置。
                       
-                      To use CommonJS modules in the browser you can use a command-line thing called [browserify](https://github.com/substack/node-browserify). I won't go into the details on how to use it here but it lets you use `require` to load modules into your programs.
-                      
-                      Now that we have `formuploader.js` (and it is loaded in the page as a script tag) we just need to require it and use it! Here is how our application specific code looks now:
+                      我们得到了```formuploader.js```，只要引入并使用它就可以了！操作如下：
                 
                           var formUploader = require('formuploader')
                           document.querySelector('form').onsubmit = formUploader.submit
                       
-                      Now our application is only two lines of code and has the following benefits:
+                      现在我们的代码只有两行，有以下好处：
                       
-                      - easier for new developers to understand -- they won't get bogged down by having to read through all of the `formuploader` functions
-                      - `formuploader` can get used in other places without duplicating code and can easily be shared on github
-                      - the code itself is nice and simple and easy to read
+                      - 易于新开发者理解，他们不会为阅读所有的`formuploader`函数而陷入困境。
+                      - `formuploader`不用复制粘贴代码，只要在github或者npm下载分享的代码就可以了。
+
+                      ## 3. 处理每一个错误
+                                            
+                      常见错误有几种
+                      - 语法错误（运行失败）
+                      - 运行时错误（可以运行但是有bug）
+                      - 平台错误（文件权限问题、磁盘问题、网络问题）
+
+                      前两条规则主要是提高你的代码的可读性，而这条是让你的代码更稳定。在处理回调时，您将根据定义处理发送的任务，在后台执行某些操作，最后成功完成或失败中止。任何有经验的开发人员都会告诉你，你永远不会知道这些错误发生什么时候发生，所以在问题出现时都必须有所对策。
                       
-                      There are lots of module patterns for [web browser](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth) and [on the server](http://nodejs.org/api/modules.html). Some of them get very complicated. The ones shown here are what I consider to be the simplest to understand.
+                      最常用的回调错误处理是Node.js风格，也就是回调函数的第一个参数总是错误参数。
                       
-                      ### Additional reading
+                           var fs = require('fs')
+                           
+                           fs.readFile('/Does/not/exist', handleFile)
+                           
+                           function handleFile (error, file) {
+                             if (error) return console.error('Uhoh, there was an error', error)
+                             // otherwise, continue on and use `file` in your code
+                           }
                       
-                      - [A pattern for decoupling DOM events from @dkastner](https://gist.github.com/3392235)
+                      第一个参数是`error`是一个简单的共识，这样做可以提醒你必须处理你的错误。如果是第二个参数的话你很容易把代码写成`function handleFile (file) { }`然后就忘了处理错误。
                       
-                      *Callback Hell is a work in progress -- check back later for more content.* 
+                      代码规范化工具也可以提醒你添加回调错误处理，最简单的方法之一是使用[standard](https://standardjs.com/)。只是在你的文件目录运行` $ standard`就能检查你的代码有没有缺少错误处理。
+
+                      ### 总结
                       
-                      Please contribute new sections or fix existing ones by [forking this project on github](http://github.com/maxogden/callback-hell)!
+                      1. 不要嵌套函数，命名后调用更好
+                      2. 使用函数提升
+                      3. 处理回调函数的**每一个错误**
+                      4. 创建可重用函数，写成模块，让你更容易读懂代码。把你的代码拆分成小块可以帮助你处理错误，写测试，重构，方便为你的代码写更稳定的API
+
+                      避免回调地狱的最重要的是**移动函数**，以便程序流程可以更容易地被理解，其他程序员可以不翻遍整个文件就能知道这段程序的功能。
+
+                      你可以先把函数移动到底部，然后逐渐把函数写到模块文件里，然后使用`require`引入它（就像引用其他npm模块一样）。
+                      
+                      一些写模块的经验：
+                      
+                      - 先把经常重复使用的功能写成一个函数
+                      - 当这个函数写得够大之后，把他移动到另一个文件，用`module.exports`暴露它，然后用`require`引入
+                      - 如果你的代码是通用的，可以写readme文件和```package.json```发布到npm或者github
+                      - 一个好模块，体积要小，而且针对只一个问题
+                      - 模块中的单个文件不应超过约150行
+                      - 模块不应该有多级嵌套的JavaScript文件夹。如果是这样，它可能做的太多了
+                      - 让有经验的程序员介绍你一些好用的模块，尝试理解这个模块的功能，如果花了几分钟的话，这个模块可能就不够好了
+
+                      ### 拓展阅读
+                      
+                      Try reading my [longer introduction to callbacks](https://github.com/maxogden/art-of-node#callbacks), or try out some of the [nodeschool](http://nodeschool.io/) tutorials.
+                      
+                      Also check out the [browserify-handbook](https://github.com/substack/browserify-handbook) for examples of writing modular code.
+                      
+                      ### 关于promise/生成器/ES6？
+                      
+                      在查看更高级的解决方案之前，请记住，回调是JavaScript的一个基本部分（因为它们只是函数），你应该学习如何读写它们，然后再转向更高级的语言功能，因为它们依赖于对回调的理解。如果您还不能写可维护的回调代码，请继续努力学习！
+                      
+                      如果你真的想你的异步代码可以“从上至下阅读”，你可以试试这些美妙的方法。注意，这些功能在不同平台会有兼容性问题，使用前请先调查清楚！
+                      
+                      **Promises** 就是一种让你从上至下写回调函数的方法，它鼓励你使用try/catch处理更多类型的错误。
+                      
+                      **Generators** 可以让你“暂停”一个函数（而不暂停整个程序），它也能你从上至下写异步函数，但是代价是代码有点复杂难以理解。[wat](https://github.com/mappum/watt)就是使用这个方法。
+
+                      **Async functions** 是ES7的特性，是生成器和promise更高级的封装，有兴趣自己谷歌一下呗。
+                      
+                      就我个人而言，我使用回调函数处理90％的异步代码，当事情变得复杂时，依靠一些库，例如[run-parallel](https://github.com/feross/run-parallel)或者[run-series](https://github.com/feross/run-series)。我不认为研究回调 vs promise vs 其他什么方法对我来说有什么帮助，最重要的还是保持代码简单，不嵌套，并分成小模块。
+
+                      无论你选择何种方法，请**始终处理每个错误**，并**保持代码简洁**。
+
+                      ### 记住，只有*你*可以防止回调地狱和森林火灾。
+                      
+                      你可以在[github](http://github.com/maxogden/callback-hell)找到这个资源。
                     </div>
                   </div>
                 </div>
@@ -230,7 +329,7 @@
     
     <script type="text/javascript">
       var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/JavaScript'%3E%3C/script%3E"));
     </script>
     <script type="text/javascript">
       try {
