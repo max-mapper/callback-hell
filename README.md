@@ -1,2 +1,2 @@
-this contains a page with information about using callbacks to write javascript programs
-包含一个关于JavaScript回调函数的页面
+this contains a page with information about using callbacks to write javascript programs                  
+一个关于JavaScript回调函数的页面
